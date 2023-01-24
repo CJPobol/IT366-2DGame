@@ -16,7 +16,7 @@ int main(int argc, char * argv[])
     Color mouseColor = gfc_color8(255,100,255,200);
     
     /*program initializtion*/
-    init_logger("gf2d.log");
+    init_logger("gf2d.log", 1);
     slog("---==== BEGIN ====---");
     gf2d_graphics_initialize(
         "gf2d",
