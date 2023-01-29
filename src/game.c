@@ -4,6 +4,8 @@
 #include "simple_logger.h"
 #include "entity.h"
 
+void player_think(Entity* self);
+
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
@@ -36,10 +38,17 @@ int main(int argc, char * argv[])
     sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
 
-    Entity *ent = entity_new();
-    if (ent)
+    Entity* player = entity_new();
+    if (player)
     {
-        ent->sprite = gf2d_sprite_load_image("images/playerDown.png");
+        player->up = gf2d_sprite_load_image("images/playerUp.png");
+        player->down = gf2d_sprite_load_image("images/playerDown.png");
+        player->right = gf2d_sprite_load_image("images/playerRight.png");
+        player->left = gf2d_sprite_load_image("images/playerLeft.png");
+
+        player->currentSprite = player->down;
+        player->position = vector2d(100, 10);
+        player->think = player_think;
     }
 
     /*main game loop*/
@@ -51,7 +60,9 @@ int main(int argc, char * argv[])
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
-        
+
+        entity_think_all();
+        entity_update_all();
         
         gf2d_graphics_clear_screen();// clears drawing buffers
         // all drawing should happen betweem clear_screen and next_frame
@@ -72,12 +83,41 @@ int main(int argc, char * argv[])
                 (int)mf);
 
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
-        
+
+
+        //----------BASIC CONTROLS-----------//
+        if (keys[SDL_SCANCODE_W])
+        {
+            player->currentSprite = player->up;
+            player->position.y += -1;
+        }
+        if (keys[SDL_SCANCODE_A])
+        {
+            player->currentSprite = player->left;
+            player->position.x += -1;
+        }
+        if (keys[SDL_SCANCODE_S])
+        {
+            player->currentSprite = player->down;
+            player->position.y += 1;
+        }
+        if (keys[SDL_SCANCODE_D])
+        {
+            player->currentSprite = player->right;
+            player->position.x += 1;
+        }
+        //-----------------------------------//
+
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     slog("---==== END ====---");
     return 0;
+}
+
+void player_think(Entity* self)
+{
+    
 }
 
 /*eol@eof*/

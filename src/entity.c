@@ -63,17 +63,21 @@ void entity_free(Entity* ent)
 		slog("no entity provided");
 		return;
 	}
-	if (ent->sprite)gf2d_sprite_free(ent->sprite);
+	if (ent->currentSprite)gf2d_sprite_free(ent->currentSprite);
+	if (ent->up)gf2d_sprite_free(ent->up);
+	if (ent->down)gf2d_sprite_free(ent->down);
+	if (ent->right)gf2d_sprite_free(ent->right);
+	if (ent->left)gf2d_sprite_free(ent->left);
 	memset(ent, 0, sizeof(Entity));
 }
 
 void entity_draw(Entity *ent)
 {
 	if (!ent) return;
-	if (ent->sprite)
+	if (ent->currentSprite)
 	{
 		gf2d_sprite_draw(
-			ent->sprite,
+			ent->currentSprite,
 			ent->position,
 			NULL,
 			NULL,
@@ -97,19 +101,32 @@ void entity_draw_all()
 void entity_think(Entity* ent)
 {
 	if (!ent) return;
+	if (ent->think)ent->think(ent);
 }
 
 void entity_think_all()
 {
+	int i;
+	for (i = 0; i < entity_manager.entity_max; i++)
+	{
+		if (!entity_manager.entity_list[i]._inuse) continue;
+		entity_think(&entity_manager.entity_list[i]);
+	}
+}
 
-};
-
-void entity_update()
+void entity_update(Entity *ent)
 {
-
-};
+	if (!ent) return;
+	vector2d_add(ent->position, ent->position, ent->velocity);
+	entity_draw(ent);
+}
 
 void entity_update_all()
 {
-
-};
+	int i;
+	for (i = 0; i < entity_manager.entity_max; i++)
+	{
+		if (!entity_manager.entity_list[i]._inuse) continue;
+		entity_update(&entity_manager.entity_list[i]);
+	}
+}

@@ -7,11 +7,20 @@
 typedef struct Entity_S
 {
 	Bool		_inuse;
-	Sprite*		sprite;
+
+	Sprite*		down;
+	Sprite*		up;
+	Sprite*		right;
+	Sprite*		left;
+
+	Sprite*		currentSprite;
+
 	float		frame;
 	Vector2D	position;
 	Vector2D	velocity;
 	Vector2D	acceleration;
+
+
 
 	void(*think)(struct Entity_S *self);
 
@@ -42,6 +51,8 @@ void entity_free(Entity* ent);
 void entity_free_all();
 
 void entity_draw_all();
+
+void entity_think_all();
 
 void entity_update_all();
 
