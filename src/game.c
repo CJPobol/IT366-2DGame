@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include "gfc_shape.h"
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "simple_logger.h"
@@ -47,8 +48,40 @@ int main(int argc, char * argv[])
         player->left = gf2d_sprite_load_image("images/playerLeft.png");
 
         player->currentSprite = player->down;
-        player->position = vector2d(100, 10);
+        player->position = vector2d(500, 300);
+
+        
+
         player->think = player_think;
+    }
+
+    Entity* walls[8];
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i] = entity_new();
+        walls[i]->currentSprite = gf2d_sprite_load_image("images/tallWall.png");
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i] = entity_new();
+        walls[i]->currentSprite = gf2d_sprite_load_image("images/wideWall.png");
+    }
+    walls[0]->position = vector2d(0, 0);
+    walls[1]->position = vector2d(0, 500);
+    walls[2]->position = vector2d(1150, 0);
+    walls[3]->position = vector2d(1150, 500);
+    walls[4]->position = vector2d(0, 0);
+    walls[5]->position = vector2d(750, 0);
+    walls[6]->position = vector2d(0, 670);
+    walls[7]->position = vector2d(750, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 250);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 450, 50);
     }
 
     /*main game loop*/
@@ -88,23 +121,38 @@ int main(int argc, char * argv[])
         //----------BASIC CONTROLS-----------//
         if (keys[SDL_SCANCODE_W])
         {
-            player->currentSprite = player->up;
-            player->position.y += -1;
+            if (!gfc_rect_overlap(player->bounds, walls[4]->bounds) && !gfc_rect_overlap(player->bounds, walls[5]->bounds))
+            {
+                player->currentSprite = player->up;
+                player->position.y += -2;
+            }
         }
         if (keys[SDL_SCANCODE_A])
         {
-            player->currentSprite = player->left;
-            player->position.x += -1;
+            if (!gfc_rect_overlap(player->bounds, walls[0]->bounds) && !gfc_rect_overlap(player->bounds, walls[1]->bounds))
+            {
+                player->currentSprite = player->left;
+                player->position.x += -2;
+            }
+            
         }
         if (keys[SDL_SCANCODE_S])
         {
-            player->currentSprite = player->down;
-            player->position.y += 1;
+            if (!gfc_rect_overlap(player->bounds, walls[6]->bounds) && !gfc_rect_overlap(player->bounds, walls[7]->bounds))
+            {
+                player->currentSprite = player->down;
+                player->position.y += 2;
+            }
+            
         }
         if (keys[SDL_SCANCODE_D])
         {
-            player->currentSprite = player->right;
-            player->position.x += 1;
+            if (!gfc_rect_overlap(player->bounds, walls[2]->bounds) && !gfc_rect_overlap(player->bounds, walls[3]->bounds))
+            {
+                player->currentSprite = player->right;
+                player->position.x += 2;
+            }
+            
         }
         //-----------------------------------//
 
@@ -117,7 +165,7 @@ int main(int argc, char * argv[])
 
 void player_think(Entity* self)
 {
-    
+    self->bounds = gfc_rect(self->position.x, self->position.y, 100, 150);
 }
 
 /*eol@eof*/
