@@ -2,6 +2,7 @@
 #define __ENTITY_H__
 
 #include "gfc_types.h"
+#include "gfc_shape.h"
 #include "gf2d_sprite.h"
 
 typedef struct Entity_S
@@ -20,7 +21,7 @@ typedef struct Entity_S
 	Vector2D	velocity;
 	Vector2D	acceleration;
 
-
+	Rect		bounds;
 
 	void(*think)(struct Entity_S *self);
 
