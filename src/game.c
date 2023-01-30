@@ -7,6 +7,16 @@
 
 void player_think(Entity* self);
 
+void mainLevel(Entity* walls[8], Entity *self);
+
+void resourceLevel(Entity* walls[8], Entity* self);
+
+void combatLevel(Entity* walls[8], Entity* self);
+
+void shopLevel(Entity* walls[8], Entity* self);
+
+void menuLevel(Entity* walls[8], Entity* self);
+
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
@@ -48,7 +58,7 @@ int main(int argc, char * argv[])
         player->left = gf2d_sprite_load_image("images/playerLeft.png");
 
         player->currentSprite = player->down;
-        player->position = vector2d(500, 300);
+        player->position = vector2d(550, 300);
 
         
 
@@ -66,23 +76,10 @@ int main(int argc, char * argv[])
         walls[i] = entity_new();
         walls[i]->currentSprite = gf2d_sprite_load_image("images/wideWall.png");
     }
-    walls[0]->position = vector2d(0, 0);
-    walls[1]->position = vector2d(0, 500);
-    walls[2]->position = vector2d(1150, 0);
-    walls[3]->position = vector2d(1150, 500);
-    walls[4]->position = vector2d(0, 0);
-    walls[5]->position = vector2d(750, 0);
-    walls[6]->position = vector2d(0, 670);
-    walls[7]->position = vector2d(750, 670);
 
-    for (int i = 0; i < 4; i++)
-    {
-        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 250);
-    }
-    for (int i = 4; i < 8; i++)
-    {
-        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 450, 50);
-    }
+    player->level = 1;
+
+
 
     /*main game loop*/
     while(!done)
@@ -143,7 +140,6 @@ int main(int argc, char * argv[])
                 player->currentSprite = player->down;
                 player->position.y += 2;
             }
-            
         }
         if (keys[SDL_SCANCODE_D])
         {
@@ -152,9 +148,19 @@ int main(int argc, char * argv[])
                 player->currentSprite = player->right;
                 player->position.x += 2;
             }
-            
         }
         //-----------------------------------//
+
+        if (player->level == 0)
+            menuLevel(walls, player);
+        if (player->level == 1)
+            mainLevel(walls, player);
+        if (player->level == 2)
+            resourceLevel(walls, player);
+        if (player->level == 3)
+            shopLevel(walls, player);
+        if (player->level == 4)
+            combatLevel(walls, player);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
@@ -166,6 +172,146 @@ int main(int argc, char * argv[])
 void player_think(Entity* self)
 {
     self->bounds = gfc_rect(self->position.x, self->position.y, 100, 150);
+
+    if (self->position.y <= 0) //top exit
+    {
+        self->position = vector2d(550, 710);
+        if (self->level == 1)
+            self->level = 0;
+        if (self->level == 4)
+            self->level = 1;
+    }
+    if (self->position.y >= 720) //bottom exit
+    {
+        self->position = vector2d(550, 10);
+        if (self->level == 1)
+            self->level = 4;
+        if (self->level == 0)
+            self->level = 1;
+    }
+    if (self->position.x <= 0) //left exit
+    {
+        self->position = vector2d(1190, 300);
+        if (self->level == 1)
+            self->level = 2;
+        if (self->level == 3)
+            self->level = 1;
+    }
+    if (self->position.x >= 1200) //right exit
+    {
+        self->position = vector2d(10, 300);
+        if (self->level == 1)
+            self->level = 3;
+        if (self->level == 2)
+            self->level = 1;
+
+    }
+
+}
+
+void mainLevel(Entity* walls[8], Entity* self)
+{
+    walls[0]->position = vector2d(0, -100);
+    walls[1]->position = vector2d(0, 460);
+    walls[2]->position = vector2d(1150, -100);
+    walls[3]->position = vector2d(1150, 460);
+    walls[4]->position = vector2d(-100, 0);
+    walls[5]->position = vector2d(700, 0);
+    walls[6]->position = vector2d(-100, 670);
+    walls[7]->position = vector2d(700, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 360);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
+}
+
+void menuLevel(Entity* walls[8], Entity* self)
+{
+    walls[0]->position = vector2d(0, 0);
+    walls[1]->position = vector2d(0, 360);
+    walls[2]->position = vector2d(1150, 0);
+    walls[3]->position = vector2d(1150, 360);
+    walls[4]->position = vector2d(0, 0);
+    walls[5]->position = vector2d(600, 0);
+    walls[6]->position = vector2d(-100, 670);
+    walls[7]->position = vector2d(700, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 360);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
+}
+
+void resourceLevel(Entity* walls[8], Entity* self)
+{
+    walls[0]->position = vector2d(0, 0);
+    walls[1]->position = vector2d(0, 360);
+    walls[2]->position = vector2d(1150, -100);
+    walls[3]->position = vector2d(1150, 460);
+    walls[4]->position = vector2d(0, 0);
+    walls[5]->position = vector2d(600, 0);
+    walls[6]->position = vector2d(0, 670);
+    walls[7]->position = vector2d(600, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 360);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
+}
+
+void shopLevel(Entity* walls[8], Entity* self) 
+{
+    walls[0]->position = vector2d(0, -100);
+    walls[1]->position = vector2d(0, 460);
+    walls[2]->position = vector2d(1150, 0);
+    walls[3]->position = vector2d(1150, 360);
+    walls[4]->position = vector2d(0, 0);
+    walls[5]->position = vector2d(600, 0);
+    walls[6]->position = vector2d(0, 670);
+    walls[7]->position = vector2d(600, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 360);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
+}
+
+void combatLevel(Entity* walls[8], Entity* self)
+{
+    walls[0]->position = vector2d(0, 0);
+    walls[1]->position = vector2d(0, 360);
+    walls[2]->position = vector2d(1150, 0);
+    walls[3]->position = vector2d(1150, 360);
+    walls[4]->position = vector2d(-100, 0);
+    walls[5]->position = vector2d(700, 0);
+    walls[6]->position = vector2d(0, 670);
+    walls[7]->position = vector2d(600, 670);
+
+    for (int i = 0; i < 4; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 50, 360);
+    }
+    for (int i = 4; i < 8; i++)
+    {
+        walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
 }
 
 /*eol@eof*/
