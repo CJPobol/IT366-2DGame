@@ -21,6 +21,8 @@ typedef struct Entity_S
 	Vector2D	velocity;
 	Vector2D	acceleration;
 
+	int			level;			//0 = menu; 1 = main; 2 = resource; 3 = shop; 4 = combat
+
 	Rect		bounds;
 
 	void(*think)(struct Entity_S *self);
