@@ -4,7 +4,7 @@
 # How to Play
 
 
-#Testing Deliverables
+# Testing Deliverables
 The deliverables for this project are:
 - An Interactable Environment
 - UI
