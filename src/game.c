@@ -46,7 +46,7 @@ int main(int argc, char * argv[])
     SDL_ShowCursor(SDL_DISABLE);
     
     /*demo setup*/
-    sprite = gf2d_sprite_load_image("images/backgrounds/bg_flat.png");
+    sprite = gf2d_sprite_load_image("images/backgrounds/background.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
 
     Entity* player = entity_new();
