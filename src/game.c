@@ -6,6 +6,7 @@
 #include "entity.h"
 
 void player_think(Entity* self);
+void bullet_think(Entity* self);
 
 void mainLevel(Entity* walls[8], Entity *self);
 
@@ -16,6 +17,8 @@ void combatLevel(Entity* walls[8], Entity* self);
 void shopLevel(Entity* walls[8], Entity* self);
 
 void menuLevel(Entity* walls[8], Entity* self);
+
+void fireBullet(Vector2D velocity, Entity* player);
 
 int main(int argc, char * argv[])
 {
@@ -60,7 +63,7 @@ int main(int argc, char * argv[])
         player->currentSprite = player->down;
         player->position = vector2d(550, 300);
 
-        
+        player->cooldown = 100;
 
         player->think = player_think;
     }
@@ -79,7 +82,7 @@ int main(int argc, char * argv[])
 
     player->level = 1;
 
-
+    float lastBullet = player->cooldown; //how long ago the last bullet was fired
 
     /*main game loop*/
     while(!done)
@@ -90,6 +93,7 @@ int main(int argc, char * argv[])
         SDL_GetMouseState(&mx,&my);
         mf+=0.1;
         if (mf >= 16.0)mf = 0;
+        lastBullet += 1;
 
         entity_think_all();
         entity_update_all();
@@ -149,6 +153,26 @@ int main(int argc, char * argv[])
                 player->position.x += 2;
             }
         }
+        if (keys[SDL_SCANCODE_UP] && lastBullet >= player->cooldown)
+        {
+                fireBullet(vector2d(0, -5), player);
+                lastBullet = 0;
+        }
+        if (keys[SDL_SCANCODE_DOWN] && lastBullet >= player->cooldown)
+        {
+            fireBullet(vector2d(0, 5), player);
+            lastBullet = 0;
+        }
+        if (keys[SDL_SCANCODE_LEFT] && lastBullet >= player->cooldown)
+        {
+            fireBullet(vector2d(-5, 0), player);
+            lastBullet = 0;
+        }
+        if (keys[SDL_SCANCODE_RIGHT] && lastBullet >= player->cooldown)
+        {
+            fireBullet(vector2d(5, 0), player);
+            lastBullet = 0;
+        }
         //-----------------------------------//
 
         if (player->level == 0)
@@ -163,7 +187,7 @@ int main(int argc, char * argv[])
             combatLevel(walls, player);
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
-        slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
+        //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     slog("---==== END ====---");
     return 0;
@@ -312,6 +336,26 @@ void combatLevel(Entity* walls[8], Entity* self)
     {
         walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
     }
+}
+
+void fireBullet(Vector2D velocity, Entity* player)
+{
+    Entity* bullet = entity_new();
+    vector2d_add(bullet->position, player->position, vector2d(50, 75));
+    bullet->currentSprite = gf2d_sprite_load_image("images/bullet.png");
+    bullet->bounds = gfc_rect(bullet->position.x, bullet->position.y, 10, 10);
+    bullet->think = bullet_think;
+    bullet->velocity = velocity;
+}
+
+void bullet_think(Entity* self)
+{
+    if (self->position.x >= 0 && self->position.x <= 1200 && self->position.y >= 0 && self->position.y >= 720)
+    {
+        vector2d_add(self->position, self->position, self->velocity);
+        
+    }
+
 }
 
 /*eol@eof*/
