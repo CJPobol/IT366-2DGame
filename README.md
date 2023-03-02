@@ -2,10 +2,12 @@
 This game is a top-down shooter in which the player can collect resources to purchase upgrades to make them stronger.
 
 # How to Play
-WASD = Movement
-Arrow Keys = Firing
-E = Interact
-ESC = Exit
+- WASD = Movement
+- Arrow Keys = Firing
+- E = Interact
+- ESC = Exit
+
+Goal: conquer waves of enemies and use the resources you collect to make yourself stronger.
 
 # Testing Deliverables
 The deliverables for this project are:
