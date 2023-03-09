@@ -7,6 +7,7 @@
 
 void player_think(Entity* self);
 void bullet_think(Entity* self);
+void removeNodes(Entity* resources[4]);
 
 void mainLevel(Entity* walls[8], Entity *self);
 
@@ -52,6 +53,25 @@ int main(int argc, char * argv[])
     sprite = gf2d_sprite_load_image("images/backgrounds/background.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
 
+    Entity* resourceNodes[4];
+
+    resourceNodes[0] = entity_new();
+    resourceNodes[0]->currentSprite = gf2d_sprite_load_image("images/redResource.png");
+
+
+
+    resourceNodes[1] = entity_new();
+    resourceNodes[1]->currentSprite = gf2d_sprite_load_image("images/greenResource.png");
+
+
+
+    resourceNodes[2] = entity_new();
+    resourceNodes[2]->currentSprite = gf2d_sprite_load_image("images/blueResource.png");
+
+
+    resourceNodes[3] = entity_new();
+    resourceNodes[3]->currentSprite = gf2d_sprite_load_image("images/whiteResource.png");
+
     Entity* player = entity_new();
     if (player)
     {
@@ -83,6 +103,9 @@ int main(int argc, char * argv[])
     player->level = 1;
 
     float lastBullet = player->cooldown; //how long ago the last bullet was fired
+
+
+    
 
     /*main game loop*/
     while(!done)
@@ -117,6 +140,24 @@ int main(int argc, char * argv[])
                 (int)mf);
 
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
+
+        if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds))
+        {
+            slog("Red");
+        }
+        if (gfc_rect_overlap(player->bounds, resourceNodes[1]->bounds))
+        {
+            slog("Green");
+        }
+        if (gfc_rect_overlap(player->bounds, resourceNodes[2]->bounds))
+        {
+            slog("Blue");
+        }
+        if (gfc_rect_overlap(player->bounds, resourceNodes[3]->bounds))
+        {
+            slog("White");
+        }
+
 
 
         //----------BASIC CONTROLS-----------//
@@ -176,15 +217,34 @@ int main(int argc, char * argv[])
         //-----------------------------------//
 
         if (player->level == 0)
+        {
             menuLevel(walls, player);
+            removeNodes(resourceNodes);
+        }
+            
         if (player->level == 1)
+        {
             mainLevel(walls, player);
+            removeNodes(resourceNodes);
+        }
+
         if (player->level == 2)
-            resourceLevel(walls, player);
+        {
+            resourceLevel(walls, player, resourceNodes);
+        }
+
         if (player->level == 3)
+        {
             shopLevel(walls, player);
+            removeNodes(resourceNodes);
+        }
+
         if (player->level == 4)
+        {
             combatLevel(walls, player);
+            removeNodes(resourceNodes);
+        }
+
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
@@ -192,6 +252,8 @@ int main(int argc, char * argv[])
     slog("---==== END ====---");
     return 0;
 }
+
+
 
 void player_think(Entity* self)
 {
@@ -233,8 +295,17 @@ void player_think(Entity* self)
 
 }
 
+void removeNodes(Entity* resources[4])
+{
+    for (int i = 0; i < 4; i++)
+    {
+        resources[i]->position = vector2d(-200, -200);
+    }
+}
+
 void mainLevel(Entity* walls[8], Entity* self)
 {
+    
     walls[0]->position = vector2d(0, -100);
     walls[1]->position = vector2d(0, 460);
     walls[2]->position = vector2d(1150, -100);
@@ -275,7 +346,7 @@ void menuLevel(Entity* walls[8], Entity* self)
     }
 }
 
-void resourceLevel(Entity* walls[8], Entity* self)
+void resourceLevel(Entity* walls[8], Entity* self, Entity* resources[4])
 {
     walls[0]->position = vector2d(0, 0);
     walls[1]->position = vector2d(0, 360);
@@ -294,6 +365,17 @@ void resourceLevel(Entity* walls[8], Entity* self)
     {
         walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
     }
+
+    resources[0]->position = vector2d(100, 100);
+    resources[1]->position = vector2d(700, 100);
+    resources[2]->position = vector2d(100, 500);
+    resources[3]->position = vector2d(700, 500);
+
+    for (int i = 0; i < 4; i++)
+    {
+        resources[i]->bounds = gfc_rect(resources[i]->position.x, resources[i]->position.y, 300, 150);
+    }
+
 }
 
 void shopLevel(Entity* walls[8], Entity* self) 
