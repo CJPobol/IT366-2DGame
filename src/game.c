@@ -2,6 +2,7 @@
 #include "gfc_shape.h"
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
+#include "gf2d_draw.h"
 #include "simple_logger.h"
 #include "entity.h"
 
@@ -85,6 +86,9 @@ int main(int argc, char * argv[])
 
         player->cooldown = 100;
 
+        player->totalHealth = 100;
+        player->currentHealth = 100;
+
         player->think = player_think;
     }
 
@@ -104,7 +108,7 @@ int main(int argc, char * argv[])
 
     float lastBullet = player->cooldown; //how long ago the last bullet was fired
 
-
+    Sprite* collectResourcePrompt = gf2d_sprite_load_image("images/collectResourcePrompt.png");
     
 
     /*main game loop*/
@@ -139,24 +143,28 @@ int main(int argc, char * argv[])
                 &mouseColor,
                 (int)mf);
 
+            if (player->level == 4) //combat
+            {
+                gf2d_draw_rect_filled(gfc_rect(0, 0, player->totalHealth*2, 25), gfc_color(0,0,0,1));
+                gf2d_draw_rect_filled(gfc_rect(0, 0, player->currentHealth*2, 25), gfc_color(1, 0, 0, 1));
+            }
+
+            if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds) || gfc_rect_overlap(player->bounds, resourceNodes[1]->bounds)
+                || gfc_rect_overlap(player->bounds, resourceNodes[2]->bounds) || gfc_rect_overlap(player->bounds, resourceNodes[3]->bounds))
+            {
+                gf2d_sprite_draw(collectResourcePrompt,
+                    vector2d(0, 670),
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    NULL,
+                    0);
+            }
+
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
 
-        if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds))
-        {
-            slog("Red");
-        }
-        if (gfc_rect_overlap(player->bounds, resourceNodes[1]->bounds))
-        {
-            slog("Green");
-        }
-        if (gfc_rect_overlap(player->bounds, resourceNodes[2]->bounds))
-        {
-            slog("Blue");
-        }
-        if (gfc_rect_overlap(player->bounds, resourceNodes[3]->bounds))
-        {
-            slog("White");
-        }
+        
 
 
 
