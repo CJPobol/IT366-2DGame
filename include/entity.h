@@ -22,10 +22,19 @@ typedef struct Entity_S
 	Vector2D	acceleration;
 
 	int			level;			//0 = menu; 1 = main; 2 = resource; 3 = shop; 4 = combat
+	
 	float		cooldown;
-
 	int			totalHealth;
 	int			currentHealth;
+	float		collectionRate;
+
+	int			red;
+	int			green;
+	int			blue;
+	int			white;
+	int			coins;
+
+	int			shopping;
 
 	Rect		bounds;
 
