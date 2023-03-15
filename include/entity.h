@@ -18,15 +18,16 @@ typedef struct Entity_S
 
 	float		frame;
 	Vector2D	position;
-	Vector2D	velocity;
+	Vector2D	velocity;			//PLAYER UPGRADE LEVELS: 2, 3, 4, 5, 6
 	Vector2D	acceleration;
 
-	int			level;			//0 = menu; 1 = main; 2 = resource; 3 = shop; 4 = combat
+	int			level;				//0 = menu; 1 = main; 2 = resource; 3 = shop; 4 = combat
 	
-	float		cooldown;
-	int			totalHealth;
-	int			currentHealth;
-	float		collectionRate;
+	float		cooldown;			//PLAYER UPGRADE LEVELS: 100, 80, 60, 40, 20
+	int			damage;				//PLAYER UPGRADE LEVELS: 10, 20, 30, 40, 50
+	int			totalHealth;		//PLAYER UPGRADE LEVELS: 100, 150, 200, 250, 300
+	int			currentHealth;		
+	float		collectionRate;		//PLAYER UPGRADE LEVELS: 300, 250, 200, 150, 100
 
 	int			red;
 	int			green;

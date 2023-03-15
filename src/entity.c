@@ -117,7 +117,7 @@ void entity_think_all()
 void entity_update(Entity *ent)
 {
 	if (!ent) return;
-	vector2d_add(ent->position, ent->position, ent->velocity);
+	
 	entity_draw(ent);
 }
 
