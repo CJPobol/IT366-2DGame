@@ -569,7 +569,6 @@ void bullet_think(Entity* self)
     if (self->position.x >= 0 && self->position.x <= 1200 && self->position.y >= 0 && self->position.y <= 720)
     {
         vector2d_add(self->position, self->position, self->velocity);
-        slog("bullet is moving");
         self->bounds = gfc_rect(self->position.x, self->position.y, 10, 10);
     }
     else
