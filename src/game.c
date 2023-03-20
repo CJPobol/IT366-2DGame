@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     
     /*program initializtion*/
     init_logger("gf2d.log");
-    
+    gfc_input_init("config/input.cfg");
     slog("---==== BEGIN ====---");
     slog_sync();
     gf2d_graphics_initialize(
@@ -142,7 +142,7 @@ int main(int argc, char * argv[])
     /*main game loop*/
     while(!done)
     {
-        slog_sync();
+        gfc_input_update();
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         /*update things here*/
@@ -241,7 +241,7 @@ int main(int argc, char * argv[])
                 player->position.x += player->velocity.x;
             }
         }
-        if (keys[SDL_SCANCODE_E] )
+        if (gfc_input_command_pressed("interact"))
         {
             if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds) && lastCollect >= player->collectionRate) //red resource
             {
@@ -269,19 +269,19 @@ int main(int argc, char * argv[])
             }
             if (gfc_rect_overlap(player->bounds, shop->bounds)) //shop
             {
-                player->shopping = 1;
+                player->shopping = !player->shopping;
             }
         }
-        if (keys[SDL_SCANCODE_1] && player->shopping)
+        if (gfc_input_command_pressed("1") && player->shopping)
         {
-            if (player->blue >= bluePrice)
+            //if (player->blue >= bluePrice)
             {
                 vector2d_add(player->velocity, player->velocity, vector2d(1, 1));
                 player->blue -= bluePrice;
                 bluePrice *= 2;
             }
         }
-        if (keys[SDL_SCANCODE_2] && player->shopping)
+        if (gfc_input_command_pressed("2") && player->shopping)
         {
             if (player->green >= greenPrice)
             {
@@ -291,7 +291,7 @@ int main(int argc, char * argv[])
                 greenPrice *= 2;
             }
         }
-        if (keys[SDL_SCANCODE_3] && player->shopping)
+        if (gfc_input_command_pressed("3") && player->shopping)
         {
             if (player->red >= redPrice)
             {
@@ -300,7 +300,7 @@ int main(int argc, char * argv[])
                 redPrice *= 2;
             }
         }
-        if (keys[SDL_SCANCODE_4] && player->shopping)
+        if (gfc_input_command_pressed("4") && player->shopping)
         {
             if (player->white >= whitePrice)
             {
@@ -309,7 +309,7 @@ int main(int argc, char * argv[])
                 whitePrice *= 2;
             }
         }
-        if (keys[SDL_SCANCODE_5] && player->shopping)
+        if (gfc_input_command_pressed("5") && player->shopping)
         {
             if (player->coins >= coinPrice)
             {
@@ -569,7 +569,8 @@ void bullet_think(Entity* self)
     if (self->position.x >= 0 && self->position.x <= 1200 && self->position.y >= 0 && self->position.y >= 720)
     {
         vector2d_add(self->position, self->position, self->velocity);
-        
+        slog("bullet is moving");
+        self->bounds = gfc_rect(self->position.x, self->position.y, 10, 10);
     }
 
 }

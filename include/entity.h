@@ -35,7 +35,7 @@ typedef struct Entity_S
 	int			white;
 	int			coins;
 
-	int			shopping;
+	Bool		shopping;
 
 	Rect		bounds;
 
