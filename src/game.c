@@ -37,7 +37,7 @@ int main(int argc, char * argv[])
     
     /*program initializtion*/
     init_logger("gf2d.log");
-    
+    gfc_input_init("config/input.cfg");
     slog("---==== BEGIN ====---");
     slog_sync();
     gf2d_graphics_initialize(
@@ -93,6 +93,7 @@ int main(int argc, char * argv[])
 
         player->currentSprite = player->down;
         player->position = vector2d(550, 300);
+        player->velocity = vector2d(2, 2);
 
         player->collectionRate = 300;
         player->cooldown = 100;
@@ -133,11 +134,15 @@ int main(int argc, char * argv[])
     
     float lastCollect = player->collectionRate;
 
-    int begin = 0;
+    int bluePrice = 10;
+    int redPrice = 10;
+    int greenPrice = 10;
+    int whitePrice = 10;
+    int coinPrice = 10;
     /*main game loop*/
     while(!done)
     {
-        slog_sync();
+        gfc_input_update();
         SDL_PumpEvents();   // update SDL's internal event structures
         keys = SDL_GetKeyboardState(NULL); // get the keyboard state for this frame
         /*update things here*/
@@ -208,7 +213,7 @@ int main(int argc, char * argv[])
             if (!gfc_rect_overlap(player->bounds, walls[4]->bounds) && !gfc_rect_overlap(player->bounds, walls[5]->bounds))
             {
                 player->currentSprite = player->up;
-                player->position.y += -2;
+                player->position.y -= player->velocity.y;
             }
         }
         if (keys[SDL_SCANCODE_A])
@@ -216,7 +221,7 @@ int main(int argc, char * argv[])
             if (!gfc_rect_overlap(player->bounds, walls[0]->bounds) && !gfc_rect_overlap(player->bounds, walls[1]->bounds))
             {
                 player->currentSprite = player->left;
-                player->position.x += -2;
+                player->position.x -= player->velocity.x;
             }
             
         }
@@ -225,7 +230,7 @@ int main(int argc, char * argv[])
             if (!gfc_rect_overlap(player->bounds, walls[6]->bounds) && !gfc_rect_overlap(player->bounds, walls[7]->bounds))
             {
                 player->currentSprite = player->down;
-                player->position.y += 2;
+                player->position.y += player->velocity.y;
             }
         }
         if (keys[SDL_SCANCODE_D])
@@ -233,10 +238,10 @@ int main(int argc, char * argv[])
             if (!gfc_rect_overlap(player->bounds, walls[2]->bounds) && !gfc_rect_overlap(player->bounds, walls[3]->bounds))
             {
                 player->currentSprite = player->right;
-                player->position.x += 2;
+                player->position.x += player->velocity.x;
             }
         }
-        if (keys[SDL_SCANCODE_E] )
+        if (gfc_input_command_pressed("interact"))
         {
             if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds) && lastCollect >= player->collectionRate) //red resource
             {
@@ -264,7 +269,53 @@ int main(int argc, char * argv[])
             }
             if (gfc_rect_overlap(player->bounds, shop->bounds)) //shop
             {
-                player->shopping = 1;
+                player->shopping = !player->shopping;
+            }
+        }
+        if (gfc_input_command_pressed("1") && player->shopping)
+        {
+            //if (player->blue >= bluePrice)
+            {
+                vector2d_add(player->velocity, player->velocity, vector2d(1, 1));
+                player->blue -= bluePrice;
+                bluePrice *= 2;
+            }
+        }
+        if (gfc_input_command_pressed("2") && player->shopping)
+        {
+            if (player->green >= greenPrice)
+            {
+                player->totalHealth += 50;
+                player->currentHealth = player->totalHealth;
+                player->green -= greenPrice;
+                greenPrice *= 2;
+            }
+        }
+        if (gfc_input_command_pressed("3") && player->shopping)
+        {
+            if (player->red >= redPrice)
+            {
+                player->damage += 10;
+                player->red -= redPrice;
+                redPrice *= 2;
+            }
+        }
+        if (gfc_input_command_pressed("4") && player->shopping)
+        {
+            if (player->white >= whitePrice)
+            {
+                player->cooldown -= 20;
+                player->white -= whitePrice;
+                whitePrice *= 2;
+            }
+        }
+        if (gfc_input_command_pressed("5") && player->shopping)
+        {
+            if (player->coins >= coinPrice)
+            {
+                player->collectionRate -= 50;
+                player->coins -= coinPrice;
+                coinPrice *= 2;
             }
         }
 
@@ -518,7 +569,8 @@ void bullet_think(Entity* self)
     if (self->position.x >= 0 && self->position.x <= 1200 && self->position.y >= 0 && self->position.y >= 720)
     {
         vector2d_add(self->position, self->position, self->velocity);
-        
+        slog("bullet is moving");
+        self->bounds = gfc_rect(self->position.x, self->position.y, 10, 10);
     }
 
 }
