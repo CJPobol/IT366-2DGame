@@ -34,6 +34,7 @@ int main(int argc, char * argv[])
 
     int done = 0;
     int enemiesSpawned = 0;
+    int upgradeTiers[5] = { 0,0,0,0,0 };
     const Uint8 * keys;
     Sprite *sprite;
     
@@ -323,48 +324,53 @@ int main(int argc, char * argv[])
         }
         if (gfc_input_command_pressed("1") && player->shopping)
         {
-            //if (player->blue >= bluePrice)
+            if (player->blue >= bluePrice && upgradeTiers[0] < 5)
             {
                 vector2d_add(player->velocity, player->velocity, vector2d(1, 1));
                 player->blue -= bluePrice;
                 bluePrice *= 2;
+                upgradeTiers[0]++;
             }
         }
         if (gfc_input_command_pressed("2") && player->shopping)
         {
-            if (player->green >= greenPrice)
+            if (player->green >= greenPrice && upgradeTiers[1] < 5)
             {
                 player->totalHealth += 50;
                 player->currentHealth = player->totalHealth;
                 player->green -= greenPrice;
                 greenPrice *= 2;
+                upgradeTiers[1]++;
             }
         }
         if (gfc_input_command_pressed("3") && player->shopping)
         {
-            if (player->red >= redPrice)
+            if (player->red >= redPrice && upgradeTiers[2] < 5)
             {
                 player->damage += 10;
                 player->red -= redPrice;
                 redPrice *= 2;
+                upgradeTiers[2]++;
             }
         }
         if (gfc_input_command_pressed("4") && player->shopping)
         {
-            if (player->white >= whitePrice)
+            if (player->white >= whitePrice && upgradeTiers[3] < 5)
             {
                 player->cooldown -= 20;
                 player->white -= whitePrice;
                 whitePrice *= 2;
+                upgradeTiers[3]++;
             }
         }
         if (gfc_input_command_pressed("5") && player->shopping)
         {
-            if (player->coins >= coinPrice)
+            if (player->coins >= coinPrice && upgradeTiers[4] < 5)
             {
                 player->collectionRate -= 50;
                 player->coins -= coinPrice;
                 coinPrice *= 2;
+                upgradeTiers[4]++;
             }
         }
 
