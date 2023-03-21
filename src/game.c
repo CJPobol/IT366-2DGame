@@ -238,6 +238,20 @@ int main(int argc, char * argv[])
                     NULL,
                     NULL,
                     0);
+                gf2d_draw_rect_filled(gfc_rect(0, 50, 250, 50), gfc_color(0, 0, 0, 1));
+                gf2d_draw_rect_filled(gfc_rect(0, 50, upgradeTiers[0] * 50, 50), gfc_color(0, 1, 0, 1));
+
+                gf2d_draw_rect_filled(gfc_rect(0, 110, 250, 50), gfc_color(0, 0, 0, 1));
+                gf2d_draw_rect_filled(gfc_rect(0, 110, upgradeTiers[1] * 50, 50), gfc_color(0, 1, 0, 1));
+
+                gf2d_draw_rect_filled(gfc_rect(0, 170, 250, 50), gfc_color(0, 0, 0, 1));
+                gf2d_draw_rect_filled(gfc_rect(0, 170, upgradeTiers[2] * 50, 50), gfc_color(0, 1, 0, 1));
+
+                gf2d_draw_rect_filled(gfc_rect(0, 230, 250, 50), gfc_color(0, 0, 0, 1));
+                gf2d_draw_rect_filled(gfc_rect(0, 230, upgradeTiers[3] * 50, 50), gfc_color(0, 1, 0, 1));
+
+                gf2d_draw_rect_filled(gfc_rect(0, 290, 250, 50), gfc_color(0, 0, 0, 1));
+                gf2d_draw_rect_filled(gfc_rect(0, 290, upgradeTiers[4] * 50, 50), gfc_color(0, 1, 0, 1));
             }
 
             if (gfc_rect_overlap(player->bounds, resourceNodes[0]->bounds) || gfc_rect_overlap(player->bounds, resourceNodes[1]->bounds)
@@ -330,6 +344,7 @@ int main(int argc, char * argv[])
                 player->blue -= bluePrice;
                 bluePrice *= 2;
                 upgradeTiers[0]++;
+                slog("Blue Resource: %i", player->blue);
             }
         }
         if (gfc_input_command_pressed("2") && player->shopping)
@@ -341,6 +356,7 @@ int main(int argc, char * argv[])
                 player->green -= greenPrice;
                 greenPrice *= 2;
                 upgradeTiers[1]++;
+                slog("Green Resource: %i", player->green);
             }
         }
         if (gfc_input_command_pressed("3") && player->shopping)
@@ -351,6 +367,7 @@ int main(int argc, char * argv[])
                 player->red -= redPrice;
                 redPrice *= 2;
                 upgradeTiers[2]++;
+                slog("Red Resource: %i", player->red);
             }
         }
         if (gfc_input_command_pressed("4") && player->shopping)
@@ -361,6 +378,7 @@ int main(int argc, char * argv[])
                 player->white -= whitePrice;
                 whitePrice *= 2;
                 upgradeTiers[3]++;
+                slog("White Resource: %i", player->white);
             }
         }
         if (gfc_input_command_pressed("5") && player->shopping)
@@ -371,6 +389,7 @@ int main(int argc, char * argv[])
                 player->coins -= coinPrice;
                 coinPrice *= 2;
                 upgradeTiers[4]++;
+                slog("Coins: %i", player->coins);
             }
         }
 
@@ -529,7 +548,7 @@ int main(int argc, char * argv[])
 
         }
 
-        if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
+        if (keys[SDL_SCANCODE_0])done = 1; // exit condition
         //if (!player->shopping)
             //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
