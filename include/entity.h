@@ -24,7 +24,7 @@ typedef struct Entity_S
 	int			level;				//0 = menu; 1 = main; 2 = resource; 3 = shop; 4 = combat
 	
 	float		cooldown;			//PLAYER UPGRADE LEVELS: 100, 80, 60, 40, 20
-	int			damage;				//PLAYER UPGRADE LEVELS: 10, 20, 30, 40, 50
+	float		damage;				//PLAYER UPGRADE LEVELS: 10, 20, 30, 40, 50
 	int			totalHealth;		//PLAYER UPGRADE LEVELS: 100, 150, 200, 250, 300
 	int			currentHealth;		
 	float		collectionRate;		//PLAYER UPGRADE LEVELS: 300, 250, 200, 150, 100

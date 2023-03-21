@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <stdlib.h>
 #include "gfc_shape.h"
 #include "gfc_input.h"
 #include "gf2d_graphics.h"
@@ -9,13 +10,16 @@
 
 void player_think(Entity* self);
 void bullet_think(Entity* self);
+void enemy_think(Entity* self, Entity* player);
 void removeNodes(Entity* resources[4]);
 
 void mainLevel(Entity* walls[8], Entity *self);
 
 void resourceLevel(Entity* walls[8], Entity* self, Entity* resources[4]);
 
-void combatLevel(Entity* walls[8], Entity* self);
+void spawnEnemy(Entity* player, int enemiesSpawned);
+
+void combatLevel(Entity* walls[8], Entity* self, int time, int enemiesSpawned);
 
 void shopLevel(Entity* walls[8], Entity* self, Entity* shop);
 
@@ -26,7 +30,10 @@ void fireBullet(Vector2D velocity, Entity* player);
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
+    srand(time());
+
     int done = 0;
+    int enemiesSpawned = 0;
     const Uint8 * keys;
     Sprite *sprite;
     
@@ -112,6 +119,41 @@ int main(int argc, char * argv[])
         slog("player initialized");
     }
 
+    Entity* monster1 = entity_new();
+    monster1->currentSprite = gf2d_sprite_load_image("images/monster1.png");
+    monster1->currentHealth = 10;
+    monster1->damage = 0.01;
+    monster1->bounds = gfc_rect(1000, 500, 100, 150);
+    monster1->think = enemy_think;
+
+    Entity* monster2 = entity_new();
+    monster2->currentSprite = gf2d_sprite_load_image("images/monster2.png");
+    monster2->currentHealth = 30;  
+    monster2->damage = 0.02;
+    monster2->bounds = gfc_rect(100, 200, 100, 120);
+    monster2->think = enemy_think;
+
+    Entity* monster3 = entity_new();
+    monster3->currentSprite = gf2d_sprite_load_image("images/monster3.png");
+    monster3->currentHealth = 70;   
+    monster3->damage = 0.01;
+    monster3->bounds = gfc_rect(550, 500, 100, 100);
+    monster3->think = enemy_think;
+
+    Entity* monster4 = entity_new();
+    monster4->currentSprite = gf2d_sprite_load_image("images/monster4.png");
+    monster4->currentHealth = 20;   
+    monster4->damage = 0.005;
+    monster4->bounds = gfc_rect(100, 500, 100, 150);
+    monster4->think = enemy_think;
+
+    Entity* monster5 = entity_new();
+    monster5->currentSprite = gf2d_sprite_load_image("images/monster5.png");
+    monster5->currentHealth = 50;   
+    monster5->damage = 0.01;
+    monster5->bounds = gfc_rect(1000, 200, 100, 150);
+    monster5->think = enemy_think;
+
     Entity* walls[8];
     for (int i = 0; i < 4; i++)
     {
@@ -133,6 +175,7 @@ int main(int argc, char * argv[])
     Sprite* collectResourcePrompt = gf2d_sprite_load_image("images/collectResourcePrompt.png");
     
     float lastCollect = player->collectionRate;
+    int lastEnemy = 0;
 
     int bluePrice = 10;
     int redPrice = 10;
@@ -151,6 +194,8 @@ int main(int argc, char * argv[])
         if (mf >= 16.0)mf = 0;
         lastBullet += 1;
         lastCollect += 1;
+        lastEnemy += 1;
+        
 
         entity_think_all();
         entity_update_all();
@@ -345,6 +390,11 @@ int main(int argc, char * argv[])
         {
             menuLevel(walls, player);
             removeNodes(resourceNodes);
+            monster1->position = vector2d(-200, -200);
+            monster2->position = vector2d(-200, -200);
+            monster3->position = vector2d(-200, -200);
+            monster4->position = vector2d(-200, -200);
+            monster5->position = vector2d(-200, -200);
         }
             
         if (player->level == 1)
@@ -352,6 +402,13 @@ int main(int argc, char * argv[])
             mainLevel(walls, player);
             removeNodes(resourceNodes);
             shop->position = vector2d(-200, -200);
+            
+            monster1->position = vector2d(-200, -200);
+            monster2->position = vector2d(-200, -200);
+            monster3->position = vector2d(-200, -200);
+            monster4->position = vector2d(-200, -200);
+            monster5->position = vector2d(-200, -200);
+
         }
 
         if (player->level == 2)
@@ -369,11 +426,44 @@ int main(int argc, char * argv[])
 
         if (player->level == 4)
         {
-            combatLevel(walls, player);
+            combatLevel(walls, player, lastEnemy, enemiesSpawned);
             removeNodes(resourceNodes);
             shop->position = vector2d(-200, -200);
-        }
 
+            monster1->position = vector2d(1000, 500);
+            monster2->position = vector2d(100, 200);
+            monster3->position = vector2d(550, 500);
+            monster4->position = vector2d(100, 500);
+            monster5->position = vector2d(1000, 200);
+
+            if (gfc_rect_overlap(monster1->bounds, player->bounds))
+            {
+                slog("OVERLAP");
+                player->currentHealth -= monster1->damage;
+            }
+            if (gfc_rect_overlap(monster2->bounds, player->bounds))
+            {
+                slog("OVERLAP");
+                player->currentHealth -= monster2->damage;
+            }
+            if (gfc_rect_overlap(monster3->bounds, player->bounds))
+            {
+                slog("OVERLAP");
+                player->currentHealth -= monster3->damage;
+            }
+            if (gfc_rect_overlap(monster4->bounds, player->bounds))
+            {
+                slog("OVERLAP");
+                player->currentHealth -= monster4->damage;
+            }
+            if (gfc_rect_overlap(monster5->bounds, player->bounds))
+            {
+                slog("OVERLAP");
+                player->currentHealth -= monster5->damage;
+            }
+
+
+        }
 
         if (keys[SDL_SCANCODE_ESCAPE])done = 1; // exit condition
         //if (!player->shopping)
@@ -421,6 +511,16 @@ void player_think(Entity* self)
         if (self->level == 2)
             self->level = 1;
 
+    }
+
+    if (self->currentHealth <= 0)
+    {
+        self->level = 0;
+        self->position = vector2d(550, 300);
+        self->currentHealth = self->totalHealth;
+        self->coins -= 5;
+        if (self->coins < 0)
+            self->coins = 0;
     }
 
 }
@@ -533,7 +633,7 @@ void shopLevel(Entity* walls[8], Entity* self, Entity* shop)
     shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
 }
 
-void combatLevel(Entity* walls[8], Entity* self)
+void combatLevel(Entity* walls[8], Entity* self, int time, int enemiesSpawned)
 {
     walls[0]->position = vector2d(0, 0);
     walls[1]->position = vector2d(0, 360);
@@ -552,6 +652,122 @@ void combatLevel(Entity* walls[8], Entity* self)
     {
         walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
     }
+
+    
+
+}
+
+void spawnEnemy(Entity* player, int enemiesSpawned)
+{
+    //RANDOM ENEMY SPAWNING NOT WORKING YET; EVENTUALLY USE THIS INSTEAD OF WHATS ABOVE
+    /*Entity* enemy = entity_new();
+    
+    int enemyType = rand() % 5;
+    float width = 100, height = 100;
+    Rect enemyspawn;
+    int x, y;
+    do
+    {
+        x = 50 + rand() % 1000;
+        y = 50 + rand() % 480;
+        slog("determined position: %i, %i", x, y);
+        
+        
+        enemyspawn = gfc_rect(x, y, width, height);
+    } while (gfc_rect_overlap(enemyspawn, player->bounds)); //to make sure enemies don't spawn on top of you
+
+    //enemy->position = vector2d(x, y);
+    enemy->position.x = 400;
+    enemy->position.y = 500;
+    
+    enemy->bounds = enemyspawn;
+
+
+    enemy->think = enemy_think;
+    switch (enemyType) {
+    case 0:
+        enemy->currentSprite = gf2d_sprite_load_image("images/monster1.png");
+        enemy->currentHealth = 10;
+        enemy->velocity = vector2d(2,2);
+        enemy->damage = 1;
+        width = 100;
+        height = 150;
+        break;
+
+    case 1:
+        enemy->currentSprite = gf2d_sprite_load_image("images/monster2.png");
+        enemy->currentHealth = 30;
+        enemy->velocity = vector2d(1, 1);
+        enemy->damage = 2;
+        width = 100;
+        height = 120;
+        break;
+
+    case 2:
+        enemy->currentSprite = gf2d_sprite_load_image("images/monster3.png");
+        enemy->currentHealth = 70;
+        enemy->velocity = vector2d(0.5, 0.5);
+        enemy->damage = 1;
+        width = 100;
+        height = 100;
+        break;
+
+    case 3:
+        enemy->currentSprite = gf2d_sprite_load_image("images/monster4.png");
+        enemy->currentHealth = 20;
+        enemy->velocity = vector2d(3, 3);
+        enemy->damage = 0.5;
+        width = 100;
+        height = 150;
+        break;
+
+    case 4:
+        enemy->currentSprite = gf2d_sprite_load_image("images/monster5.png");
+        enemy->currentHealth = 50;
+        enemy->velocity = vector2d(4, 4);
+        enemy->damage = 1;
+        width = 100;
+        height = 150;
+
+    }
+
+    
+    */
+}
+
+void enemy_think(Entity* self, Entity* player)
+{
+
+    /*if (self->position.x >= 50 && self->position.x <= 1050 && self->position.y >= 50 && self->position.y <= 570)
+    {
+        if (player->position.x < self->position.x)
+        {
+            if (player->position.y < self->position.y)
+            {
+                self->velocity = player->velocity;
+                vector2d_add(self->position, self->position, self->velocity);
+            }
+            else
+                vector2d_add(self->position, self->position, vector2d(-self->velocity.x, self->velocity.y));
+        }
+        else if (player->position.y < self->position.y)
+        {
+            vector2d_add(self->position, self->position, vector2d(self->velocity.x, -self->velocity.y));
+        }
+        else
+            vector2d_add(self->position, self->position, self->velocity);
+
+        self->bounds = gfc_rect(self->position.x, self->position.y, 100, 100);
+        
+    }*/
+    
+    
+    if (self->currentHealth <= 0)
+    {
+        entity_free(self);
+        player->coins++;
+    }
+
 }
 
 void fireBullet(Vector2D velocity, Entity* player)
@@ -562,14 +778,21 @@ void fireBullet(Vector2D velocity, Entity* player)
     bullet->bounds = gfc_rect(bullet->position.x, bullet->position.y, 10, 10);
     bullet->think = bullet_think;
     bullet->velocity = velocity;
+    bullet->damage = player->damage;
 }
 
-void bullet_think(Entity* self)
+void bullet_think(Entity* self, Entity* monster1, Entity* monster2, Entity* monster3, Entity* monster4, Entity* monster5)
 {
     if (self->position.x >= 0 && self->position.x <= 1200 && self->position.y >= 0 && self->position.y <= 720)
     {
         vector2d_add(self->position, self->position, self->velocity);
         self->bounds = gfc_rect(self->position.x, self->position.y, 10, 10);
+        if (gfc_rect_overlap(self->bounds, monster1->bounds))
+        {
+            monster1->currentHealth -= self->damage;
+            entity_free(self);
+        }
+            
     }
     else
         entity_free(self);
