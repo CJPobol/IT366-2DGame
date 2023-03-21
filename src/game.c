@@ -9,7 +9,7 @@
 #include "entity.h"
 
 void player_think(Entity* self);
-void bullet_think(Entity* self);
+void bullet_think(Entity* self, Entity* monster1, Entity* monster2, Entity* monster3, Entity* monster4, Entity* monster5);
 void enemy_think(Entity* self, Entity* player);
 void removeNodes(Entity* resources[4]);
 
@@ -25,7 +25,7 @@ void shopLevel(Entity* walls[8], Entity* self, Entity* shop);
 
 void menuLevel(Entity* walls[8], Entity* self);
 
-void fireBullet(Vector2D velocity, Entity* player);
+Entity* fireBullet(Vector2D velocity, Entity* player);
 
 int main(int argc, char * argv[])
 {
@@ -106,6 +106,7 @@ int main(int argc, char * argv[])
         player->cooldown = 100;
         player->totalHealth = 100;
         player->currentHealth = 100;
+        player->damage = 10;
 
         player->red = 0;
         player->green = 0;
@@ -182,6 +183,8 @@ int main(int argc, char * argv[])
     int greenPrice = 10;
     int whitePrice = 10;
     int coinPrice = 10;
+
+    Entity* currentBullet = entity_new();
     /*main game loop*/
     while(!done)
     {
@@ -195,6 +198,7 @@ int main(int argc, char * argv[])
         lastBullet += 1;
         lastCollect += 1;
         lastEnemy += 1;
+        
         
 
         entity_think_all();
@@ -366,22 +370,22 @@ int main(int argc, char * argv[])
 
         if (keys[SDL_SCANCODE_UP] && lastBullet >= player->cooldown)
         {
-                fireBullet(vector2d(0, -5), player);
-                lastBullet = 0;
+            currentBullet = fireBullet(vector2d(0, -5), player);
+            lastBullet = 0;
         }
         if (keys[SDL_SCANCODE_DOWN] && lastBullet >= player->cooldown)
         {
-            fireBullet(vector2d(0, 5), player);
+            currentBullet = fireBullet(vector2d(0, 5), player);
             lastBullet = 0;
         }
         if (keys[SDL_SCANCODE_LEFT] && lastBullet >= player->cooldown)
         {
-            fireBullet(vector2d(-5, 0), player);
+            currentBullet = fireBullet(vector2d(-5, 0), player);
             lastBullet = 0;
         }
         if (keys[SDL_SCANCODE_RIGHT] && lastBullet >= player->cooldown)
         {
-            fireBullet(vector2d(5, 0), player);
+            currentBullet = fireBullet(vector2d(5, 0), player);
             lastBullet = 0;
         }
         //-----------------------------------//
@@ -438,30 +442,84 @@ int main(int argc, char * argv[])
 
             if (gfc_rect_overlap(monster1->bounds, player->bounds))
             {
-                slog("OVERLAP");
                 player->currentHealth -= monster1->damage;
             }
             if (gfc_rect_overlap(monster2->bounds, player->bounds))
             {
-                slog("OVERLAP");
                 player->currentHealth -= monster2->damage;
             }
             if (gfc_rect_overlap(monster3->bounds, player->bounds))
             {
-                slog("OVERLAP");
                 player->currentHealth -= monster3->damage;
             }
             if (gfc_rect_overlap(monster4->bounds, player->bounds))
             {
-                slog("OVERLAP");
                 player->currentHealth -= monster4->damage;
             }
             if (gfc_rect_overlap(monster5->bounds, player->bounds))
             {
-                slog("OVERLAP");
                 player->currentHealth -= monster5->damage;
             }
-
+            if (gfc_rect_overlap(monster1->bounds, currentBullet->bounds))
+            {
+                monster1->currentHealth -= currentBullet->damage;
+                entity_free(currentBullet);
+            }
+            if (gfc_rect_overlap(monster2->bounds, currentBullet->bounds))
+            {
+                monster2->currentHealth -= currentBullet->damage;
+                entity_free(currentBullet);
+            }
+            if (gfc_rect_overlap(monster3->bounds, currentBullet->bounds))
+            {
+                monster3->currentHealth -= currentBullet->damage;
+                entity_free(currentBullet);
+            }
+            if (gfc_rect_overlap(monster4->bounds, currentBullet->bounds))
+            {
+                monster4->currentHealth -= currentBullet->damage;
+                entity_free(currentBullet);
+            }
+            if (gfc_rect_overlap(monster5->bounds, currentBullet->bounds))
+            {
+                monster5->currentHealth -= currentBullet->damage;
+                entity_free(currentBullet);
+            }
+            if (monster1->currentHealth <= 0)
+            {
+                monster1->currentHealth = 10;
+                
+                player->coins++;
+                slog("Coins: %i", player->coins);
+            }
+            if (monster2->currentHealth <= 0)
+            {
+                monster2->currentHealth = 30;
+                
+                player->coins += 3;
+                slog("Coins: %i", player->coins);
+            }
+            if (monster3->currentHealth <= 0)
+            {
+                monster3->currentHealth = 70;
+                
+                player->coins += 2;
+                slog("Coins: %i", player->coins);
+            }
+            if (monster4->currentHealth <= 0)
+            {
+                monster4->currentHealth = 20;
+                
+                player->coins += 3;
+                slog("Coins: %i", player->coins);
+            }
+            if (monster5->currentHealth <= 0)
+            {
+                monster5->currentHealth = 50;
+                
+                player->coins += 4;
+                slog("Coins: %i", player->coins);
+            }
 
         }
 
@@ -762,15 +820,11 @@ void enemy_think(Entity* self, Entity* player)
     }*/
     
     
-    if (self->currentHealth <= 0)
-    {
-        entity_free(self);
-        player->coins++;
-    }
+    
 
 }
 
-void fireBullet(Vector2D velocity, Entity* player)
+Entity* fireBullet(Vector2D velocity, Entity* player)
 {
     Entity* bullet = entity_new();
     vector2d_add(bullet->position, player->position, vector2d(50, 75));
@@ -779,6 +833,7 @@ void fireBullet(Vector2D velocity, Entity* player)
     bullet->think = bullet_think;
     bullet->velocity = velocity;
     bullet->damage = player->damage;
+    return bullet;
 }
 
 void bullet_think(Entity* self, Entity* monster1, Entity* monster2, Entity* monster3, Entity* monster4, Entity* monster5)
