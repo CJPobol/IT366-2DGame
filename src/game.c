@@ -179,11 +179,18 @@ int main(int argc, char * argv[])
     float lastCollect = player->collectionRate;
     int lastEnemy = 0;
 
-    int bluePrice = 10;
+    int bluePrice = 5;
+    int redPrice = 5;
+    int greenPrice = 5;
+    int whitePrice = 5;
+    int coinPrice = 5;
+
+    //REAL PRICES (LOWERED FOR IN-CLASS TESTING)
+    /*int bluePrice = 10;
     int redPrice = 10;
     int greenPrice = 10;
     int whitePrice = 10;
-    int coinPrice = 10;
+    int coinPrice = 10;*/
 
     Entity* currentBullet = entity_new();
     /*main game loop*/
@@ -336,13 +343,15 @@ int main(int argc, char * argv[])
                 player->shopping = !player->shopping;
             }
         }
+        //NOTE: PRICES ADJUSTED FOR EASIER SHOWCASING IN CLASS; COMMENTED PRICES ARE THE BALANCED ADJUSTMENTS
         if (gfc_input_command_pressed("1") && player->shopping)
         {
             if (player->blue >= bluePrice && upgradeTiers[0] < 5)
             {
                 vector2d_add(player->velocity, player->velocity, vector2d(1, 1));
                 player->blue -= bluePrice;
-                bluePrice *= 2;
+                //bluePrice *= 2;
+                bluePrice += 5;
                 upgradeTiers[0]++;
                 slog("Blue Resource: %i", player->blue);
             }
@@ -351,10 +360,11 @@ int main(int argc, char * argv[])
         {
             if (player->green >= greenPrice && upgradeTiers[1] < 5)
             {
-                player->totalHealth += 50;
+                player->cooldown -= 20;
                 player->currentHealth = player->totalHealth;
                 player->green -= greenPrice;
-                greenPrice *= 2;
+                //greenPrice *= 2;
+                greenPrice += 5;
                 upgradeTiers[1]++;
                 slog("Green Resource: %i", player->green);
             }
@@ -365,7 +375,8 @@ int main(int argc, char * argv[])
             {
                 player->damage += 10;
                 player->red -= redPrice;
-                redPrice *= 2;
+                //redPrice *= 2;
+                redPrice += 5;
                 upgradeTiers[2]++;
                 slog("Red Resource: %i", player->red);
             }
@@ -374,9 +385,10 @@ int main(int argc, char * argv[])
         {
             if (player->white >= whitePrice && upgradeTiers[3] < 5)
             {
-                player->cooldown -= 20;
+                player->totalHealth += 50;
                 player->white -= whitePrice;
-                whitePrice *= 2;
+                //whitePrice *= 2;
+                whitePrice += 5;
                 upgradeTiers[3]++;
                 slog("White Resource: %i", player->white);
             }
@@ -387,7 +399,8 @@ int main(int argc, char * argv[])
             {
                 player->collectionRate -= 50;
                 player->coins -= coinPrice;
-                coinPrice *= 2;
+                //coinPrice *= 2;
+                coinPrice += 5;
                 upgradeTiers[4]++;
                 slog("Coins: %i", player->coins);
             }
@@ -431,6 +444,7 @@ int main(int argc, char * argv[])
             mainLevel(walls, player);
             removeNodes(resourceNodes);
             shop->position = vector2d(-200, -200);
+            shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
             
             monster1->position = vector2d(-200, -200);
             monster2->position = vector2d(-200, -200);
@@ -444,6 +458,7 @@ int main(int argc, char * argv[])
         {
             resourceLevel(walls, player, resourceNodes);
             shop->position = vector2d(-200, -200);
+            shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
         }
 
         if (player->level == 3)
@@ -451,6 +466,7 @@ int main(int argc, char * argv[])
             shopLevel(walls, player, shop);
             removeNodes(resourceNodes);
             shop->position = vector2d(600, 200);
+            shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
         }
 
         if (player->level == 4)
@@ -458,6 +474,7 @@ int main(int argc, char * argv[])
             combatLevel(walls, player, lastEnemy, enemiesSpawned);
             removeNodes(resourceNodes);
             shop->position = vector2d(-200, -200);
+            shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
 
             monster1->position = vector2d(1000, 500);
             monster2->position = vector2d(100, 200);
