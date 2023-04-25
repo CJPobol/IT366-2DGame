@@ -27,6 +27,8 @@ void menuLevel(Entity* walls[8], Entity* self);
 
 Entity* fireBullet(Vector2D velocity, Entity* player);
 
+int menuOn = 1;
+
 int main(int argc, char * argv[])
 {
     /*variable declarations*/
@@ -64,6 +66,7 @@ int main(int argc, char * argv[])
     /*demo setup*/
     sprite = gf2d_sprite_load_image("images/backgrounds/background.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
+    Sprite* menu = gf2d_sprite_load_image("images/mainmenu.png");
 
     Entity* resourceNodes[4];
 
@@ -193,6 +196,7 @@ int main(int argc, char * argv[])
     int coinPrice = 10;*/
 
     Entity* currentBullet = entity_new();
+    
     /*main game loop*/
     while(!done)
     {
@@ -272,6 +276,10 @@ int main(int argc, char * argv[])
                     NULL,
                     NULL,
                     0);
+            }
+            if (menuOn == 1)
+            {
+                gf2d_sprite_draw(menu, vector2d(0, 0), NULL, NULL, NULL, NULL, NULL, 0);
             }
 
         gf2d_graphics_next_frame();// render current draw frame and skip to the next frame
@@ -425,6 +433,14 @@ int main(int argc, char * argv[])
         {
             currentBullet = fireBullet(vector2d(5, 0), player);
             lastBullet = 0;
+        }
+        if (keys[SDL_SCANCODE_RETURN])
+        {
+            menuOn = 0;
+        }
+        if (keys[SDL_SCANCODE_ESCAPE])
+        {
+            menuOn = 1;
         }
         //-----------------------------------//
 
@@ -615,6 +631,7 @@ void player_think(Entity* self)
 
     if (self->currentHealth <= 0)
     {
+        menuOn = 1;
         self->level = 0;
         self->position = vector2d(550, 300);
         self->currentHealth = self->totalHealth;
