@@ -28,6 +28,7 @@ void menuLevel(Entity* walls[8], Entity* self);
 Entity* fireBullet(Vector2D velocity, Entity* player);
 
 int menuOn = 1;
+int editor = 0;
 
 int main(int argc, char * argv[])
 {
@@ -436,11 +437,21 @@ int main(int argc, char * argv[])
         }
         if (keys[SDL_SCANCODE_RETURN])
         {
+            editor = 0;
+            player->level = 0;
+            player->position = vector2d(550, 300);
             menuOn = 0;
         }
         if (keys[SDL_SCANCODE_ESCAPE])
         {
             menuOn = 1;
+        }
+        if (keys[SDL_SCANCODE_L])
+        {
+            editor = 1;
+            menuOn = 0;
+            player->level = 0;
+            player->position = vector2d(-200, -200);
         }
         //-----------------------------------//
 
@@ -595,7 +606,7 @@ void player_think(Entity* self)
 {
     self->bounds = gfc_rect(self->position.x, self->position.y, 100, 150);
 
-    if (self->position.y <= 0) //top exit
+    if (self->position.y <= 0 && editor == 0) //top exit
     {
         self->position = vector2d(550, 710);
         if (self->level == 1)
@@ -611,7 +622,7 @@ void player_think(Entity* self)
         if (self->level == 0)
             self->level = 1;
     }
-    if (self->position.x <= 0) //left exit
+    if (self->position.x <= 0 && editor == 0) //left exit
     {
         self->position = vector2d(1190, 300);
         if (self->level == 1)

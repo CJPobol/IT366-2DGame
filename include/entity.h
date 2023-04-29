@@ -18,6 +18,7 @@ typedef struct Entity_S
 
 	float		frame;
 	Vector2D	position;
+	Vector2D	savedPosition;
 	Vector2D	velocity;			//PLAYER UPGRADE LEVELS: 2, 3, 4, 5, 6
 	Vector2D	acceleration;
 
