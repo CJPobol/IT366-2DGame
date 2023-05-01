@@ -28,6 +28,7 @@ typedef struct Entity_S
 	float		damage;				//PLAYER UPGRADE LEVELS: 10, 20, 30, 40, 50
 	int			totalHealth;		//PLAYER UPGRADE LEVELS: 100, 150, 200, 250, 300
 	int			currentHealth;		
+	Bool		killed;
 	float		collectionRate;		//PLAYER UPGRADE LEVELS: 300, 250, 200, 150, 100
 
 	int			red;

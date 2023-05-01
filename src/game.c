@@ -8,6 +8,7 @@
 #include "simple_logger.h"
 #include "entity.h"
 
+void powerUp(Entity* powerup, Vector2D position);
 void player_think(Entity* self);
 void bullet_think(Entity* self, Entity* monster1, Entity* monster2, Entity* monster3, Entity* monster4, Entity* monster5);
 void enemy_think(Entity* self, Entity* player);
@@ -131,6 +132,7 @@ int main(int argc, char * argv[])
     monster1->damage = 0.01;
     monster1->bounds = gfc_rect(1000, 500, 100, 150);
     monster1->think = enemy_think;
+    monster1->killed = false;
 
     Entity* monster2 = entity_new();
     monster2->currentSprite = gf2d_sprite_load_image("images/monster2.png");
@@ -138,6 +140,7 @@ int main(int argc, char * argv[])
     monster2->damage = 0.02;
     monster2->bounds = gfc_rect(100, 200, 100, 120);
     monster2->think = enemy_think;
+    monster2->killed = false;
 
     Entity* monster3 = entity_new();
     monster3->currentSprite = gf2d_sprite_load_image("images/monster3.png");
@@ -145,6 +148,7 @@ int main(int argc, char * argv[])
     monster3->damage = 0.01;
     monster3->bounds = gfc_rect(550, 500, 100, 100);
     monster3->think = enemy_think;
+    monster3->killed = false;
 
     Entity* monster4 = entity_new();
     monster4->currentSprite = gf2d_sprite_load_image("images/monster4.png");
@@ -152,6 +156,7 @@ int main(int argc, char * argv[])
     monster4->damage = 0.005;
     monster4->bounds = gfc_rect(100, 500, 100, 150);
     monster4->think = enemy_think;
+    monster4->killed = false;
 
     Entity* monster5 = entity_new();
     monster5->currentSprite = gf2d_sprite_load_image("images/monster5.png");
@@ -159,6 +164,7 @@ int main(int argc, char * argv[])
     monster5->damage = 0.01;
     monster5->bounds = gfc_rect(1000, 200, 100, 150);
     monster5->think = enemy_think;
+    monster5->killed = false;
 
     Entity* walls[8];
     for (int i = 0; i < 4; i++)
@@ -171,6 +177,9 @@ int main(int argc, char * argv[])
         walls[i] = entity_new();
         walls[i]->currentSprite = gf2d_sprite_load_image("images/wideWall.png");
     }
+
+    Entity* powerup = entity_new();
+
 
     Sprite* shopMenu = gf2d_sprite_load_image("images/upgradeList.png");
 
@@ -503,11 +512,11 @@ int main(int argc, char * argv[])
             shop->position = vector2d(-200, -200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
 
-            monster1->position = vector2d(1000, 500);
-            monster2->position = vector2d(100, 200);
-            monster3->position = vector2d(550, 500);
-            monster4->position = vector2d(100, 500);
-            monster5->position = vector2d(1000, 200);
+            if (!monster1->killed)monster1->position = vector2d(1000, 500);
+            if (!monster2->killed)monster2->position = vector2d(100, 200);
+            if (!monster3->killed)monster3->position = vector2d(550, 500);
+            if (!monster4->killed)monster4->position = vector2d(100, 500);
+            if (!monster5->killed)monster5->position = vector2d(1000, 200);
 
             if (gfc_rect_overlap(monster1->bounds, player->bounds))
             {
@@ -554,38 +563,43 @@ int main(int argc, char * argv[])
                 monster5->currentHealth -= currentBullet->damage;
                 entity_free(currentBullet);
             }
-            if (monster1->currentHealth <= 0)
+            if (monster1->currentHealth <= 0 && !monster1->killed)
             {
-                monster1->currentHealth = 10;
-                
+                powerUp(powerup, monster1->position);
+                monster1->killed = true;
+                monster1->position = vector2d(-200, -200);
                 player->coins++;
                 slog("Coins: %i", player->coins);
             }
-            if (monster2->currentHealth <= 0)
+            if (monster2->currentHealth <= 0 && !monster2->killed)
             {
-                monster2->currentHealth = 30;
-                
+                powerUp(powerup, monster2->position);
+                monster2->killed = true;
+                monster2->position = vector2d(-200, -200);
                 player->coins += 3;
                 slog("Coins: %i", player->coins);
             }
-            if (monster3->currentHealth <= 0)
+            if (monster3->currentHealth <= 0 && !monster3->killed)
             {
-                monster3->currentHealth = 70;
-                
+                powerUp(powerup, monster3->position);
+                monster3->killed = true;
+                monster3->position = vector2d(-200, -200);
                 player->coins += 2;
                 slog("Coins: %i", player->coins);
             }
-            if (monster4->currentHealth <= 0)
+            if (monster4->currentHealth <= 0 && !monster4->killed)
             {
-                monster4->currentHealth = 20;
-                
+                powerUp(powerup, monster4->position);
+                monster4->killed = true;
+                monster4->position = vector2d(-200, -200);
                 player->coins += 3;
                 slog("Coins: %i", player->coins);
             }
-            if (monster5->currentHealth <= 0)
+            if (monster5->currentHealth <= 0 && !monster5->killed)
             {
-                monster5->currentHealth = 50;
-                
+                powerUp(powerup, monster5->position);
+                monster5->killed = true;
+                monster5->position = vector2d(-200, -200);
                 player->coins += 4;
                 slog("Coins: %i", player->coins);
             }
@@ -600,7 +614,15 @@ int main(int argc, char * argv[])
     return 0;
 }
 
-
+void powerUp(Entity* powerup, Vector2D position)
+{
+    if (gfc_random() >= 0.3) //30% chance
+    {
+        
+        powerup->currentSprite = gf2d_sprite_load_image("images/redResource.png");
+        powerup->position = position;   
+    }
+}
 
 void player_think(Entity* self)
 {
@@ -865,7 +887,7 @@ void spawnEnemy(Entity* player, int enemiesSpawned)
 
 void enemy_think(Entity* self, Entity* player)
 {
-
+    self->bounds = gfc_rect(self->position.x, self->position.y, 100, 100);
     /*if (self->position.x >= 50 && self->position.x <= 1050 && self->position.y >= 50 && self->position.y <= 570)
     {
         if (player->position.x < self->position.x)
