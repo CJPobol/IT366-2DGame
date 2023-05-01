@@ -27,7 +27,7 @@ typedef struct Entity_S
 	float		cooldown;			//PLAYER UPGRADE LEVELS: 100, 80, 60, 40, 20
 	float		damage;				//PLAYER UPGRADE LEVELS: 10, 20, 30, 40, 50
 	int			totalHealth;		//PLAYER UPGRADE LEVELS: 100, 150, 200, 250, 300
-	int			currentHealth;		
+	float		currentHealth;		
 	Bool		killed;
 	float		collectionRate;		//PLAYER UPGRADE LEVELS: 300, 250, 200, 150, 100
 
@@ -36,6 +36,8 @@ typedef struct Entity_S
 	int			blue;
 	int			white;
 	int			coins;
+
+	int			usingPower;			//0 = none; 1 = speed; 2 = damage; 3 = invincibility; 4 = firerate; 5 = healthboost
 
 	Bool		shopping;
 

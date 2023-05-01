@@ -119,6 +119,7 @@ int main(int argc, char * argv[])
         player->blue = 0;
         player->white = 0;
         player->coins = 0;
+        player->usingPower = 5;
 
         player->shopping = 0;
 
@@ -129,7 +130,7 @@ int main(int argc, char * argv[])
     Entity* monster1 = entity_new();
     monster1->currentSprite = gf2d_sprite_load_image("images/monster1.png");
     monster1->currentHealth = 10;
-    monster1->damage = 0.01;
+    monster1->damage = 0.5;
     monster1->bounds = gfc_rect(1000, 500, 100, 150);
     monster1->think = enemy_think;
     monster1->killed = false;
@@ -137,7 +138,7 @@ int main(int argc, char * argv[])
     Entity* monster2 = entity_new();
     monster2->currentSprite = gf2d_sprite_load_image("images/monster2.png");
     monster2->currentHealth = 30;  
-    monster2->damage = 0.02;
+    monster2->damage = 0.6;
     monster2->bounds = gfc_rect(100, 200, 100, 120);
     monster2->think = enemy_think;
     monster2->killed = false;
@@ -145,7 +146,7 @@ int main(int argc, char * argv[])
     Entity* monster3 = entity_new();
     monster3->currentSprite = gf2d_sprite_load_image("images/monster3.png");
     monster3->currentHealth = 70;   
-    monster3->damage = 0.01;
+    monster3->damage = 0.3;
     monster3->bounds = gfc_rect(550, 500, 100, 100);
     monster3->think = enemy_think;
     monster3->killed = false;
@@ -153,7 +154,7 @@ int main(int argc, char * argv[])
     Entity* monster4 = entity_new();
     monster4->currentSprite = gf2d_sprite_load_image("images/monster4.png");
     monster4->currentHealth = 20;   
-    monster4->damage = 0.005;
+    monster4->damage = 0.2;
     monster4->bounds = gfc_rect(100, 500, 100, 150);
     monster4->think = enemy_think;
     monster4->killed = false;
@@ -161,7 +162,7 @@ int main(int argc, char * argv[])
     Entity* monster5 = entity_new();
     monster5->currentSprite = gf2d_sprite_load_image("images/monster5.png");
     monster5->currentHealth = 50;   
-    monster5->damage = 0.01;
+    monster5->damage = 0.4;
     monster5->bounds = gfc_rect(1000, 200, 100, 150);
     monster5->think = enemy_think;
     monster5->killed = false;
@@ -207,6 +208,7 @@ int main(int argc, char * argv[])
 
     Entity* currentBullet = entity_new();
     
+    int powerUpTracker = 0;
     /*main game loop*/
     while(!done)
     {
@@ -220,8 +222,39 @@ int main(int argc, char * argv[])
         lastBullet += 1;
         lastCollect += 1;
         lastEnemy += 1;
-        
-        
+        if (player->usingPower > 0) powerUpTracker += 1;
+        if (player->usingPower == 1)
+        {
+            player->velocity = vector2d(upgradeTiers[0] + 3, upgradeTiers[0] + 3);
+        }
+        if (player->usingPower == 2)
+        {
+            player->damage = 10 + upgradeTiers[2]*10 + 10;
+        }
+        if (player->usingPower == 4)
+        {
+            player->cooldown = (100 - (upgradeTiers[1] * 20)) - 40;
+        }
+        if (player->usingPower == 5)
+        {
+            player->totalHealth = (100 + (50 * upgradeTiers[3])) + 50;
+            if (player->currentHealth < player->totalHealth)player->currentHealth += 0.2;
+        }
+
+        if (powerUpTracker >= 1000)
+        {
+            if (player->usingPower == 1) vector2d_sub(player->velocity, player->velocity, vector2d(1, 1));
+            if (player->usingPower == 2) player->damage -= 10;
+            if (player->usingPower == 4) player->cooldown += 40;
+            if (player->usingPower == 5)
+            {
+                player->totalHealth -= 50;
+                if (player->currentHealth > player->totalHealth)
+                    player->currentHealth = player->totalHealth;
+            }
+            player->usingPower = 0;
+            powerUpTracker = 0;
+        }
 
         entity_think_all();
         entity_update_all();
@@ -520,23 +553,28 @@ int main(int argc, char * argv[])
 
             if (gfc_rect_overlap(monster1->bounds, player->bounds))
             {
-                player->currentHealth -= monster1->damage;
+                if (player->usingPower != 3)
+                    player->currentHealth -= monster1->damage;
             }
             if (gfc_rect_overlap(monster2->bounds, player->bounds))
             {
-                player->currentHealth -= monster2->damage;
+                if (player->usingPower != 3)
+                    player->currentHealth -= monster2->damage;
             }
             if (gfc_rect_overlap(monster3->bounds, player->bounds))
             {
-                player->currentHealth -= monster3->damage;
+                if (player->usingPower != 3)
+                    player->currentHealth -= monster3->damage;
             }
             if (gfc_rect_overlap(monster4->bounds, player->bounds))
             {
-                player->currentHealth -= monster4->damage;
+                if (player->usingPower != 3)
+                    player->currentHealth -= monster4->damage;
             }
             if (gfc_rect_overlap(monster5->bounds, player->bounds))
             {
-                player->currentHealth -= monster5->damage;
+                if (player->usingPower != 3)
+                    player->currentHealth -= monster5->damage;
             }
             if (gfc_rect_overlap(monster1->bounds, currentBullet->bounds))
             {
