@@ -501,11 +501,13 @@ int main(int argc, char * argv[])
         {
             menuLevel(walls, player);
             removeNodes(resourceNodes);
+
             monster1->position = vector2d(-200, -200);
             monster2->position = vector2d(-200, -200);
             monster3->position = vector2d(-200, -200);
             monster4->position = vector2d(-200, -200);
             monster5->position = vector2d(-200, -200);
+            powerup->position = vector2d(-200, -200);
         }
             
         if (player->level == 1)
@@ -514,13 +516,13 @@ int main(int argc, char * argv[])
             removeNodes(resourceNodes);
             shop->position = vector2d(-200, -200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
-            
+
             monster1->position = vector2d(-200, -200);
             monster2->position = vector2d(-200, -200);
             monster3->position = vector2d(-200, -200);
             monster4->position = vector2d(-200, -200);
             monster5->position = vector2d(-200, -200);
-
+            powerup->position = vector2d(-200, -200);
         }
 
         if (player->level == 2)
@@ -551,6 +553,11 @@ int main(int argc, char * argv[])
             if (!monster4->killed)monster4->position = vector2d(100, 500);
             if (!monster5->killed)monster5->position = vector2d(1000, 200);
 
+            if (gfc_rect_overlap(player->bounds, powerup->bounds))
+            {
+                powerup->position = vector2d(-200, -200);
+                player->usingPower = powerup->usingPower;
+            }
             if (gfc_rect_overlap(monster1->bounds, player->bounds))
             {
                 if (player->usingPower != 3)
@@ -654,11 +661,12 @@ int main(int argc, char * argv[])
 
 void powerUp(Entity* powerup, Vector2D position)
 {
-    if (gfc_random() >= 0.3) //30% chance
+    if (gfc_random() <= 0.4) //40% chance
     {
-        
-        powerup->currentSprite = gf2d_sprite_load_image("images/redResource.png");
-        powerup->position = position;   
+        powerup->currentSprite = gf2d_sprite_load_image("images/powerUp.png");
+        powerup->usingPower = (rand() % 5) + 1;
+        powerup->position = position;
+        powerup->bounds = gfc_rect(powerup->position.x, powerup->position.y, 30, 30);
     }
 }
 
