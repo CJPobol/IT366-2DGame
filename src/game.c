@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "gfc_shape.h"
 #include "gfc_input.h"
+#include "gfc_audio.h"
 #include "gf2d_graphics.h"
 #include "gf2d_sprite.h"
 #include "gf2d_draw.h"
@@ -50,6 +51,7 @@ int main(int argc, char * argv[])
     /*program initializtion*/
     init_logger("gf2d.log");
     gfc_input_init("config/input.cfg");
+    gfc_audio_init(10, 3, 1, 2, true, true);
     slog("---==== BEGIN ====---");
     slog_sync();
     gf2d_graphics_initialize(
@@ -69,6 +71,10 @@ int main(int argc, char * argv[])
     sprite = gf2d_sprite_load_image("images/backgrounds/background.png");
     mouse = gf2d_sprite_load_all("images/pointer.png",32,32,16,0);
     Sprite* menu = gf2d_sprite_load_image("images/mainmenu.png");
+
+    Sound* pickupItem = gfc_sound_load("sounds/PickupSound.mp3", 1, 2);
+    Sound* music = gfc_sound_load("sounds/GameMusic.mp3", 1, 1);
+    gfc_sound_play(music, 100, 0.8, -1, 1);
 
     Entity* resourceNodes[4];
 
@@ -556,6 +562,7 @@ int main(int argc, char * argv[])
             if (gfc_rect_overlap(player->bounds, powerup->bounds))
             {
                 powerup->position = vector2d(-200, -200);
+                gfc_sound_play(pickupItem, 0, 1, -1, -1);
                 player->usingPower = powerup->usingPower;
             }
             if (gfc_rect_overlap(monster1->bounds, player->bounds))
@@ -656,6 +663,7 @@ int main(int argc, char * argv[])
             //slog("Rendering at %f FPS",gf2d_graphics_get_frames_per_second());
     }
     slog("---==== END ====---");
+    gfc_sound_clear_all();
     return 0;
 }
 
