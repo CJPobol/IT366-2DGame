@@ -261,6 +261,10 @@ int main(int argc, char * argv[])
             player->totalHealth = (100 + (50 * upgradeTiers[3])) + 50;
             if (player->currentHealth < player->totalHealth)player->currentHealth += 0.2;
         }
+        if (player->usingPower == 6)
+        {
+            player->velocity = vector2d(upgradeTiers[0] + 1, upgradeTiers[0] + 1);
+        }
 
         if (powerUpTracker >= 1000)
         {
@@ -273,6 +277,7 @@ int main(int argc, char * argv[])
                 if (player->currentHealth > player->totalHealth)
                     player->currentHealth = player->totalHealth;
             }
+            if (player->usingPower == 6) vector2d_add(player->velocity, player->velocity, vector2d(1, 1));
             player->usingPower = 0;
             powerUpTracker = 0;
         }
@@ -358,12 +363,20 @@ int main(int argc, char * argv[])
                 player->currentSprite = player->up;
                 player->position.y -= player->velocity.y;
             }
+            if (gfc_rect_overlap(player->bounds, worldElements[4]->bounds))
+            {
+                player->position.y -= player->velocity.y;
+            }
         }
         if (keys[SDL_SCANCODE_A])
         {
             if (!gfc_rect_overlap(player->bounds, walls[0]->bounds) && !gfc_rect_overlap(player->bounds, walls[1]->bounds))
             {
                 player->currentSprite = player->left;
+                player->position.x -= player->velocity.x;
+            }
+            if (gfc_rect_overlap(player->bounds, worldElements[4]->bounds))
+            {
                 player->position.x -= player->velocity.x;
             }
             
@@ -375,12 +388,20 @@ int main(int argc, char * argv[])
                 player->currentSprite = player->down;
                 player->position.y += player->velocity.y;
             }
+            if (gfc_rect_overlap(player->bounds, worldElements[4]->bounds))
+            {
+                player->position.y += player->velocity.y;
+            }
         }
         if (keys[SDL_SCANCODE_D])
         {
             if (!gfc_rect_overlap(player->bounds, walls[2]->bounds) && !gfc_rect_overlap(player->bounds, walls[3]->bounds))
             {
                 player->currentSprite = player->right;
+                player->position.x += player->velocity.x;
+            }
+            if (gfc_rect_overlap(player->bounds, worldElements[4]->bounds))
+            {
                 player->position.x += player->velocity.x;
             }
         }
@@ -544,6 +565,25 @@ int main(int argc, char * argv[])
             monster4->position = vector2d(-200, -200);
             monster5->position = vector2d(-200, -200);
             powerup->position = vector2d(-200, -200);
+
+            if (gfc_rect_overlap(player->bounds, worldElements[0]->bounds))
+            {
+                player->currentHealth = 0;
+            }
+            if (gfc_rect_overlap(player->bounds, worldElements[1]->bounds))
+            {
+                player->usingPower = 1;
+            }
+            if (gfc_rect_overlap(player->bounds, worldElements[2]->bounds))
+            {
+                player->usingPower = 6;
+            }
+            if (gfc_rect_overlap(player->bounds, worldElements[3]->bounds))
+            {
+                int num;
+                do { num = rand() % 5; } while (num == 1);
+                player->level = num;
+            }
         }
 
         if (player->level == 2)
