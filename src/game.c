@@ -140,7 +140,7 @@ int main(int argc, char * argv[])
         player->blue = 0;
         player->white = 0;
         player->coins = 0;
-        player->usingPower = 5;
+        player->usingPower = 0;
 
         player->shopping = 0;
 
@@ -566,7 +566,7 @@ int main(int argc, char * argv[])
             monster5->position = vector2d(-200, -200);
             powerup->position = vector2d(-200, -200);
 
-            if (gfc_rect_overlap(player->bounds, worldElements[0]->bounds))
+            if (gfc_rect_overlap(player->bounds, worldElements[0]->bounds) && player->usingPower != 3)
             {
                 player->currentHealth = 0;
             }
