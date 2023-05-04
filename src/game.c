@@ -13,9 +13,9 @@ void powerUp(Entity* powerup, Vector2D position);
 void player_think(Entity* self);
 void bullet_think(Entity* self, Entity* monster1, Entity* monster2, Entity* monster3, Entity* monster4, Entity* monster5);
 void enemy_think(Entity* self, Entity* player);
-void removeNodes(Entity* resources[4]);
+void removeNodes(Entity* resources[4], int level, Entity* worldElements[5]);
 
-void mainLevel(Entity* walls[8], Entity *self);
+void mainLevel(Entity* walls[8], Entity *self, Entity* worldElements[5]);
 
 void resourceLevel(Entity* walls[8], Entity* self, Entity* resources[4]);
 
@@ -82,10 +82,8 @@ int main(int argc, char * argv[])
     resourceNodes[0]->currentSprite = gf2d_sprite_load_image("images/redResource.png");
 
 
-
     resourceNodes[1] = entity_new();
     resourceNodes[1]->currentSprite = gf2d_sprite_load_image("images/greenResource.png");
-
 
 
     resourceNodes[2] = entity_new();
@@ -95,6 +93,23 @@ int main(int argc, char * argv[])
     resourceNodes[3] = entity_new();
     resourceNodes[3]->currentSprite = gf2d_sprite_load_image("images/whiteResource.png");
 
+    Entity* worldElements[5];
+    for (int i = 0; i < 5; i++){ worldElements[i] = entity_new(); }
+    
+    worldElements[0]->position = vector2d(100, 100);
+    worldElements[1]->position = vector2d(100, 500);
+    worldElements[2]->position = vector2d(800, 500);
+    worldElements[3]->position = vector2d(800, 100);
+    worldElements[4]->position = vector2d(500, 300);
+
+    for (int i = 0; i < 5; i++) { 
+        worldElements[i]->bounds = gfc_rect(worldElements[i]->position.x, worldElements[i]->position.y, 200, 100); }
+
+    worldElements[0]->currentSprite = gf2d_sprite_load_image("images/lava.png");
+    worldElements[1]->currentSprite = gf2d_sprite_load_image("images/speed.png");
+    worldElements[2]->currentSprite = gf2d_sprite_load_image("images/slime.png");
+    worldElements[3]->currentSprite = gf2d_sprite_load_image("images/magic.png");
+    worldElements[4]->currentSprite = gf2d_sprite_load_image("images/ice.png");
 
     Entity* shop = entity_new();
     shop->currentSprite = gf2d_sprite_load_image("images/shop.png");
@@ -506,7 +521,7 @@ int main(int argc, char * argv[])
         if (player->level == 0)
         {
             menuLevel(walls, player);
-            removeNodes(resourceNodes);
+            removeNodes(resourceNodes, player->level, worldElements);
 
             monster1->position = vector2d(-200, -200);
             monster2->position = vector2d(-200, -200);
@@ -518,8 +533,8 @@ int main(int argc, char * argv[])
             
         if (player->level == 1)
         {
-            mainLevel(walls, player);
-            removeNodes(resourceNodes);
+            mainLevel(walls, player, worldElements);
+            removeNodes(resourceNodes, player->level, worldElements);
             shop->position = vector2d(-200, -200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
 
@@ -534,6 +549,7 @@ int main(int argc, char * argv[])
         if (player->level == 2)
         {
             resourceLevel(walls, player, resourceNodes);
+            removeNodes(resourceNodes, player->level, worldElements);
             shop->position = vector2d(-200, -200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
         }
@@ -541,7 +557,7 @@ int main(int argc, char * argv[])
         if (player->level == 3)
         {
             shopLevel(walls, player, shop);
-            removeNodes(resourceNodes);
+            removeNodes(resourceNodes, player->level, worldElements);
             shop->position = vector2d(600, 200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
         }
@@ -549,7 +565,7 @@ int main(int argc, char * argv[])
         if (player->level == 4)
         {
             combatLevel(walls, player, lastEnemy, enemiesSpawned);
-            removeNodes(resourceNodes);
+            removeNodes(resourceNodes, player->level, worldElements);
             shop->position = vector2d(-200, -200);
             shop->bounds = gfc_rect(shop->position.x, shop->position.y, 250, 100);
 
@@ -729,18 +745,28 @@ void player_think(Entity* self)
 
 }
 
-void removeNodes(Entity* resources[4])
+void removeNodes(Entity* resources[4], int level, Entity* worldElements[5])
 {
-    for (int i = 0; i < 4; i++)
+    if (level != 2)
     {
-        resources[i]->position = vector2d(-200, -200);
-        resources[i]->bounds = gfc_rect(resources[i]->position.x, resources[i]->position.y, 300, 150);
+        for (int i = 0; i < 4; i++)
+        {
+            resources[i]->position = vector2d(-200, -200);
+            resources[i]->bounds = gfc_rect(resources[i]->position.x, resources[i]->position.y, 300, 150);
+        }
+    }
+    if (level != 1)
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            worldElements[i]->position = vector2d(-200, -200);
+            worldElements[i]->bounds = gfc_rect(worldElements[i]->position.x, worldElements[i]->position.y, 300, 150);
+        }
     }
 }
 
-void mainLevel(Entity* walls[8], Entity* self)
+void mainLevel(Entity* walls[8], Entity* self, Entity* worldElements[5])
 {
-    
     walls[0]->position = vector2d(0, -100);
     walls[1]->position = vector2d(0, 460);
     walls[2]->position = vector2d(1150, -100);
@@ -757,6 +783,15 @@ void mainLevel(Entity* walls[8], Entity* self)
     for (int i = 4; i < 8; i++)
     {
         walls[i]->bounds = gfc_rect(walls[i]->position.x, walls[i]->position.y, 600, 50);
+    }
+
+    worldElements[0]->position = vector2d(100, 100);
+    worldElements[1]->position = vector2d(100, 500);
+    worldElements[2]->position = vector2d(800, 500);
+    worldElements[3]->position = vector2d(800, 100);
+    worldElements[4]->position = vector2d(500, 300);
+    for (int i = 0; i < 5; i++) {
+        worldElements[i]->bounds = gfc_rect(worldElements[i]->position.x, worldElements[i]->position.y, 200, 100);
     }
 }
 
